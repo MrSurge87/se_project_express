@@ -2,7 +2,7 @@
   "name": "se_project_express",
   "version": "1.0.0",
   "description": "Description of project",
-  "main": "app.js",
+  "main": "./app.js",
   "scripts": {
     "lint": "npx eslint .",
     "start": "node app.js",

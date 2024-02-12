@@ -1,4 +1,4 @@
-class Default_Error extends Error {
+class DefaultError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 500;
@@ -6,4 +6,4 @@ class Default_Error extends Error {
   }
 }
 
-module.exports = Default_Error;
+module.exports = DefaultError;

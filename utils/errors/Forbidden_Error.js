@@ -1,4 +1,4 @@
-class Forbidden_Error extends Error {
+class ForbiddenError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 403;
@@ -6,4 +6,4 @@ class Forbidden_Error extends Error {
   }
 }
 
-module.exports = Forbidden_Error;
+module.exports = ForbiddenError;

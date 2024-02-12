@@ -1,4 +1,4 @@
-class Duplicate_Error extends Error {
+class DuplicateError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 409;
@@ -6,4 +6,4 @@ class Duplicate_Error extends Error {
   }
 }
 
-module.exports = Duplicate_Error;
+module.exports = DuplicateError;

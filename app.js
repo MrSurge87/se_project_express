@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const userRouter = require("./routes/index");
+const router = require("./routes/index");
 const clothingItemRouter = require("./routes/index");
 
 const app = express();
@@ -14,7 +14,7 @@ mongoose
   .catch(console.error);
 
 app.use(express.json());
-app.use("/", userRouter);
+app.use("/", router);
 app.use("/", clothingItemRouter);
 
 app.listen(PORT, () => {

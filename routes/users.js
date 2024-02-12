@@ -6,16 +6,15 @@ const {
   deleteUser,
 } = require("../controllers/users");
 
-//CREATE
+// CREATE
 router.post("/", createUser);
 
-//READ
+// READ
 router.get("/", getUsers);
+router.get("/:userId", getUsers);
 
-//UPDATE
-router.put("/:userId", updateUser);
+// UPDATE
 
-//DELETE
-router.delete("/:userId", deleteUser);
+// DELETE
 
 module.exports = router;

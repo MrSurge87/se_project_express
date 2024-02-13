@@ -1,10 +1,10 @@
 const User = require("../models/user");
 const {
   BadRequest,
-  Unauthorized,
-  Forbidden,
+  // Unauthorized,
+  // Forbidden,
   NotFound,
-  Duplicate,
+  // Duplicate,
   DefaultError,
 } = require("../utils/errors");
 
@@ -36,6 +36,21 @@ const getUsers = (req, res) => {
       return res
         .status(DefaultError)
         .send({ message: "An error has occurred on the server." });
+    });
+};
+
+const getUserById = (req, res) => {
+  const { userId } = req.params;
+  User.findById(userId)
+    .orFail()
+    .then((user) => res.status(200).send(user))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
+        res.status(NotFound).send({ message: "Invalid user Id." });
+      } else {
+        res.status(BadRequest).send({ message: "Cannot find user with Id." });
+      }
     });
 };
 
@@ -76,4 +91,4 @@ const updateUser = (req, res) => {
 //     });
 // };
 
-module.exports = { createUser, getUsers, updateUser }; // {deleteUser}
+module.exports = { createUser, getUsers, updateUser, getUserById }; // {deleteUser}

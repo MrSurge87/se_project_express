@@ -2,8 +2,9 @@ const router = require("express").Router();
 const {
   createUser,
   getUsers,
-  updateUser,
-  deleteUser,
+  getUserById,
+  // updateUser,
+  // deleteUser,
 } = require("../controllers/users");
 
 // CREATE
@@ -11,7 +12,7 @@ router.post("/", createUser);
 
 // READ
 router.get("/", getUsers);
-router.get("/:userId", getUsers);
+router.get("/:userId", getUserById);
 
 // UPDATE
 

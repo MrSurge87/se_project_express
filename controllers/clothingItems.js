@@ -2,10 +2,10 @@ const clothingItem = require("../models/clothingItem");
 const {
   BadRequest,
   DefaultError,
-  Duplicate,
-  Forbiden,
+  // Duplicate,
+  // Forbiden,
   NotFound,
-  Unauthorized,
+  // Unauthorized,
 } = require("../utils/errors");
 
 // CREATE ITEM
@@ -23,7 +23,8 @@ const createItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(NotFound).send({ message: "Error Not Found" });
+        res.status(BadRequest).send({ message: "Bad Request" });
+        return err;
       }
       return res
         .status(DefaultError)
@@ -35,7 +36,7 @@ const createItem = (req, res) => {
 const getClothingItem = (req, res) => {
   clothingItem
     .find({})
-    .then((clothingItems) => res.status(200).res.send(clothingItems))
+    .then((clothingItems) => res.status(200).send(clothingItems))
     .catch(() => {
       res
         .status(DefaultError)
@@ -62,24 +63,24 @@ const getClothingItem = (req, res) => {
 // UPDATE LIKES
 const updateLikes = (req, res) => {
   console.log(req.user._id);
-  const userId = req.user._id;
+  // const userId = req.user._id;
   const { itemId } = req.params;
 
   clothingItem
     .findByIdAndUpdate(
       itemId,
-      { $addToSet: { likes: req.user_id } },
+      { $addToSet: { likes: req.user._id } },
       { new: true },
     )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "DocumentNotFound") {
+      if (err.name === "DocumentNotFoundError") {
         res
           .status(NotFound)
           .send({ message: `${err.name} Error on liking item.` });
-      } else if (err.name === "castError") {
+      } else if (err.name === "CastError") {
         res
           .status(BadRequest)
           .send({ message: "Invalid credentials, cannot add like." });
@@ -99,7 +100,7 @@ const deleteItem = (req, res) => {
     .findByIdAndDelete(itemId)
     .orFail()
     .then(
-      (item) => res.status(200),
+      (item) => res.status(200).send(item),
       // .send({ messasge: "An error has occurred when deleting the item." }),
     )
     .catch((err) => {
@@ -121,11 +122,15 @@ const deleteItem = (req, res) => {
 // DELETE LIKES
 const deleteLikes = (req, res) => {
   console.log(req.user._id);
-  const userId = req.user._id;
+  // const userId = req.user._id;
   const { itemId } = req.params;
 
   clothingItem
-    .findByIdAndUpdate(itemId, { $pull: { likes: req.user_id } }, { new: true })
+    .findByIdAndUpdate(
+      itemId,
+      { $pull: { likes: req.user._id } },
+      { new: true },
+    )
     .orFail()
     .then((item) => res.send({ data: item }))
     .catch((err) => {

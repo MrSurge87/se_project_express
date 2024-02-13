@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = require("./routes/index");
-const clothingItemRouter = require("./routes/index");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -14,8 +13,12 @@ mongoose
   .catch(console.error);
 
 app.use(express.json());
+app.use((req, res, next) => {
+  req.user = { _id: "62d13fc58fbff2a798c368f7" };
+  next();
+});
+
 app.use("/", router);
-app.use("/", clothingItemRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

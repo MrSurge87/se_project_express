@@ -13,6 +13,7 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
+    .select("+password")
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -53,6 +54,24 @@ const createUser = (req, res) => {
 };
 
 // READ users
+const getCurrentUser = (req, res) => {
+  const userId = req.user._id;
+  console.log(userId);
+  console.log(req.user);
+  User.findById(userId)
+    .orFail()
+    .then((user) => res.status(200).send({ data: user }))
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NotFound).send({ message: err.message });
+      }
+      if (err.name === "CastError") {
+        return res.status(BadRequest).send({ message: err.message });
+      }
+      return res.status(DefaultError).send({ message: err.message });
+    });
+};
+
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -80,7 +99,7 @@ const getUserById = (req, res) => {
 };
 
 // UPDATE USER
-const updateUser = (req, res) => {
+const updateProfile = (req, res) => {
   const { userId } = req.params;
   User.findByIdAndUpdate(userId)
     .orFail()
@@ -116,4 +135,11 @@ const updateUser = (req, res) => {
 //     });
 // };
 
-module.exports = { login, createUser, getUsers, updateUser, getUserById }; // {deleteUser}
+module.exports = {
+  login,
+  createUser,
+  getCurrentUser,
+  getUsers,
+  updateProfile,
+  getUserById,
+}; // {deleteUser}

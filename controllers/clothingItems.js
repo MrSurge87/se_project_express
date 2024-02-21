@@ -3,7 +3,7 @@ const {
   BadRequest,
   DefaultError,
   // Duplicate,
-  // Forbiden,
+  Forbidden,
   NotFound,
   // Unauthorized,
 } = require("../utils/errors");
@@ -97,12 +97,17 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   console.log(itemId);
   clothingItem
+    .findById(itemId)
+    .orFail()
+    .then((item) => {
+      if (!item.owner.equals(req.user._id)) {
+        return res.status(Forbidden).send({ message: err.message });
+      }
+    });
+  clothingItem
     .findByIdAndDelete(itemId)
     .orFail()
-    .then(
-      (item) => res.status(200).send(item),
-      // .send({ messasge: "An error has occurred when deleting the item." }),
-    )
+    .then((item) => res.status(200).send(item))
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {

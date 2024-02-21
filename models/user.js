@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator(value) {
         return validator.isEmail(value);
-      }
+      },
     },
   },
   password: {
@@ -34,10 +34,10 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator(value) {
         return validator.isStrongPassword(value);
-      }
+      },
     },
     select: false,
-  }
+  },
 });
 
 module.exports = mongoose.model("user", userSchema);

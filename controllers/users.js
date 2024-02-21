@@ -1,23 +1,48 @@
 const User = require("../models/user");
 const {
   BadRequest,
-  // Unauthorized,
+  Unauthorized,
   // Forbidden,
   NotFound,
-  // Duplicate,
+  Duplicate,
   DefaultError,
 } = require("../utils/errors");
 
-// CREATE USER
-const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+//LOGIN
+const login = (req, res) => {
+  const { email, password } = req.body;
 
-  User.create({ name, avatar })
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.status(200).send({ token });
+    })
+    .catch((err) => {
+      console.log(err);
+      if (!email || !password) {
+        return res.status(BadRequest).send({ message: err.message });
+      }
+      return res.status(Unauthorized).send({ message: err.message });
+    });
+};
+
+// CREATE USER - SIGNUP
+const createUser = (req, res) => {
+  const { name, avatar, email, password } = req.body;
+
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ name, avatar, email, password: hash }))
     .then((user) => {
       res.status(201).send(user);
     })
     .catch((err) => {
       console.error(err);
+      if (err.code === 11000) {
+        return res.status(Duplicate).send({ message: err.message });
+      }
       if (err.name === "ValidationError") {
         return res.status(BadRequest).send({ message: err.message });
       }
@@ -91,4 +116,4 @@ const updateUser = (req, res) => {
 //     });
 // };
 
-module.exports = { createUser, getUsers, updateUser, getUserById }; // {deleteUser}
+module.exports = { login, createUser, getUsers, updateUser, getUserById }; // {deleteUser}

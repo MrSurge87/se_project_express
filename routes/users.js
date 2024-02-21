@@ -1,18 +1,23 @@
 const router = require("express").Router();
 const {
+  login,
   createUser,
-  getUsers,
-  getUserById,
+  // getUsers,
+  // getUserById,
   // updateUser,
   // deleteUser,
 } = require("../controllers/users");
 
+//SIGN IN
+router.post('/signin', login);
+
 // CREATE
-router.post("/", createUser);
+router.post("/signup", createUser);
 
 // READ
-router.get("/", getUsers);
-router.get("/:userId", getUserById);
+// router.get("/", getUsers);
+// router.get("/:userId", getUserById);
+
 
 // UPDATE
 

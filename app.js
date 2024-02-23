@@ -1,10 +1,13 @@
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const router = require("./routes/index");
-const cors = require("cors");
+
 
 const app = express();
 const { PORT = 3001 } = process.env;
+
+app.use(cors());
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
@@ -15,7 +18,7 @@ mongoose
 
 app.use(express.json());
 app.use("/", router);
-app.use(cors());
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

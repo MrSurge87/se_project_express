@@ -1,3 +1,6 @@
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/user");
 const {
   BadRequest,
@@ -13,6 +16,12 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
+    .then(() => {
+      if (!email || !password) {
+        return res.status(BadRequest).send({ message: err.message });
+      }
+      return res.status(Unauthorized).send({ message: err.message });
+    })
     .select("+password")
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -22,10 +31,6 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.log(err);
-      if (!email || !password) {
-        return res.status(BadRequest).send({ message: err.message });
-      }
-      return res.status(Unauthorized).send({ message: err.message });
     });
 };
 
@@ -72,53 +77,33 @@ const getCurrentUser = (req, res) => {
     });
 };
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
-    });
-};
-
-const getUserById = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
-    .orFail()
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        res.status(NotFound).send({ message: "Invalid user Id." });
-      } else {
-        res.status(BadRequest).send({ message: "Cannot find user with Id." });
-      }
-    });
-};
-
 // UPDATE USER
 const updateProfile = (req, res) => {
-  const { userId } = req.params;
-  User.findByIdAndUpdate(userId)
+  const { userId } = req.user._id;
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(
+    userId,
+    { name, avatar },
+    { new: true, runValidators: true },
+  )
     .orFail()
     .then((user) => {
-      res
-        .status(200)
-        .send(user)
-        .catch((err) => {
-          console.error(err);
-          if (err.name === "DocumentNotFoundError") {
-            return res.status(NotFound).send({ message: err.message });
-          }
-          if (err.name === "CastError") {
-            return res.status(BadRequest).send({ message: err.message });
-          }
-          return res
-            .status(DefaultError)
-            .send({ message: "An error has occured on the server." });
-        });
+      res.status(200).send(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return res.status(BadRequest).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NotFound).send({ message: err.message });
+      }
+      if (err.name === "CastError") {
+        return res.status(BadRequest).send({ message: err.message });
+      }
+      return res
+        .status(DefaultError)
+        .send({ message: "An error has occured on the server." });
     });
 };
 
@@ -139,7 +124,7 @@ module.exports = {
   login,
   createUser,
   getCurrentUser,
-  getUsers,
+  // getUsers,
   updateProfile,
-  getUserById,
+  // getUserById,
 }; // {deleteUser}

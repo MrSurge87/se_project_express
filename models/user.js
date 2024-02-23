@@ -32,8 +32,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     select: false,
-    minlength: [8, "Must be a minimum of 8 characters long."],
-    maxlength: [30, "Maximum number of characters is 30."],
   },
 });
 

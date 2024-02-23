@@ -7,9 +7,10 @@ const {
   deleteItem,
   deleteLikes,
 } = require("../controllers/clothingItems");
+const { auth } = require('../middlewares/auth');
 
 // CREATE
-router.post("/", createItem);
+router.post("/", auth, createItem);
 
 // READ
 router.get("/", getClothingItem);

@@ -101,13 +101,15 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        return res.status(Forbidden).send({ message: err.message });
+        return res
+          .status(Forbidden)
+          .send({ message: "Not Authorized To Delete." });
       }
-    });
-  clothingItem
-    .findByIdAndDelete(itemId)
-    .orFail()
-    .then((item) => res.status(200).send(item))
+      return clothingItem
+        .findByIdAndDelete(itemId)
+        .orFail()
+        .then((deletedItem) => res.status(200).send(deletedItem));
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {

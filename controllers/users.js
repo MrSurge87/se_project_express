@@ -11,18 +11,11 @@ const {
   DefaultError,
 } = require("../utils/errors");
 
-//LOGIN
+// LOGIN
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
-    .then(() => {
-      if (!email || !password) {
-        return res.status(BadRequest).send({ message: err.message });
-      }
-      return res.status(Unauthorized).send({ message: err.message });
-    })
-    .select("+password")
+  User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -30,7 +23,11 @@ const login = (req, res) => {
       res.status(200).send({ token });
     })
     .catch((err) => {
-      console.log(err);
+      console.error(err);
+      if (!email || !password) {
+        return res.status(BadRequest).send({ message: "Bad Request." });
+      }
+      return res.status(Unauthorized).send({ message: "Not Authorized." });
     });
 };
 
@@ -42,12 +39,15 @@ const createUser = (req, res) => {
     .hash(password, 10)
     .then((hash) => User.create({ name, avatar, email, password: hash }))
     .then((user) => {
-      res.status(201).send(user);
+      res
+        .status(201)
+        .send({ name: user.name, avatar: user.avatar, email: user.email });
     })
     .catch((err) => {
       console.error(err);
+      console.log(err.name);
       if (err.code === 11000) {
-        return res.status(Duplicate).send({ message: err.message });
+        return res.status(Duplicate).send({ message: "Duplicate Email." });
       }
       if (err.name === "ValidationError") {
         return res.status(BadRequest).send({ message: err.message });

@@ -7,7 +7,9 @@ const auth = (req, res, next) => {
   console.log(req.headers);
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    return res.status(Unauthorized).send({ message: "Authorization Required." });
+    return res
+      .status(Unauthorized)
+      .send({ message: "Authorization Required." });
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -16,11 +18,13 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    return res.status(Unauthorized).send({ message: err.message });
+    return res
+      .status(Unauthorized)
+      .send({ message: "Authorization Required." });
   }
 
   req.user = payload;
-  next();
+  return next();
 };
 
 module.exports = { auth };

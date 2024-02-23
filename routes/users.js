@@ -8,10 +8,9 @@ const {
 } = require("../controllers/users");
 const { auth } = require("../middlewares/auth");
 
-//SIGN IN
+// SIGN IN
 
 // CREATE
-
 
 // READ
 router.get("/me", auth, getCurrentUser);

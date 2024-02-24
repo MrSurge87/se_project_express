@@ -14,8 +14,10 @@ const {
 // LOGIN
 const login = (req, res) => {
   const { email, password } = req.body;
-
-  User.findUserByCredentials(email, password)
+  if (!email || !password) {
+    return res.status(BadRequest).send({ message: "Invalid data" });
+  }
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
@@ -24,9 +26,6 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (!email || !password) {
-        return res.status(BadRequest).send({ message: "Bad Request." });
-      }
       return res.status(Unauthorized).send({ message: "Not Authorized." });
     });
 };
@@ -79,7 +78,7 @@ const getCurrentUser = (req, res) => {
 
 // UPDATE USER
 const updateProfile = (req, res) => {
-  const { userId } = req.user._id;
+  const userId = req.user._id;
   const { name, avatar } = req.body;
   User.findByIdAndUpdate(
     userId,

@@ -1,18 +1,13 @@
 const clothingItem = require("../models/clothingItem");
 const {
-  BadRequest,
+  BadRequestError,
   DefaultError,
-  // Duplicate,
   Forbidden,
-  NotFound,
-  // Unauthorized,
+  NotFoundError,
 } = require("../utils/errors");
 
 // CREATE ITEM
 const createItem = (req, res) => {
-  console.log(req);
-  console.log(req.body);
-
   const { name, weather, imageUrl } = req.body;
 
   clothingItem
@@ -23,12 +18,9 @@ const createItem = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        res.status(BadRequest).send({ message: "Bad Request" });
-        return err;
+        next(new BadRequest("Invalid data"));
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server. " });
+      next(err);
     });
 };
 
@@ -37,28 +29,11 @@ const getClothingItem = (req, res) => {
   clothingItem
     .find({})
     .then((clothingItems) => res.status(200).send(clothingItems))
-    .catch(() => {
-      res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
+    .catch((err) => {
+      next(err);
     });
 };
 
-// UPDATE ITEM
-// const updateItem = (req, res) => {
-//   const { itemId } = req.params;
-//   const { imageURL } = req.body;
-
-//   clothingItem
-//     .findByIdAndUpdate(itemId, { $set: { imageURL } })
-//     .orFail()
-//     .then((item) => res.status(200).send({ data: item }))
-//     .catch(() => {
-//       res
-//         .status(DefaultError)
-//         .send({ message: "An error has occurred on the server." });
-//     });
-// };
 
 // UPDATE LIKES
 const updateLikes = (req, res) => {
@@ -76,19 +51,12 @@ const updateLikes = (req, res) => {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        res
-          .status(NotFound)
-          .send({ message: `${err.name} Error on liking item.` });
+      if (err.name === "NotFoundError") {
+        next(new NotFoundError());
       } else if (err.name === "CastError") {
-        res
-          .status(BadRequest)
-          .send({ message: "Invalid credentials, cannot add like." });
-      } else {
-        res
-          .status(DefaultError)
-          .send({ message: "An error occurred on the server." });
+        next(new BadRequestError());
       }
+      next(err);
     });
 };
 
@@ -112,17 +80,12 @@ const deleteItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        res
-          .status(NotFound)
-          .send({ message: `${err.name} Error deleting item` });
+      if (err.name === "NotFoundError") {
+        next(new NotFoundError());
       } else if (err.name === "CastError") {
-        res.status(BadRequest).send({ message: err.message });
-      } else {
-        res
-          .status(DefaultError)
-          .send({ message: "An error has occurred on the server." });
+        next(new BadRequestError("Invalid data"));
       }
+      next(err);
     });
 };
 
@@ -142,24 +105,18 @@ const deleteLikes = (req, res) => {
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        res
-          .status(NotFound)
-          .send({ message: `${err.name} Error disliking item.` });
+      if (err.name === "NotFoundError") {
+        next(new NotFoundError());
       } else if (err.name === "CastError") {
-        res.status(BadRequest).send({ message: err.message });
-      } else {
-        res
-          .status(DefaultError)
-          .send({ message: "An error has occurred on the server." });
+        next(new BadRequestError("Invalid data"));
       }
+      next(err);
     });
 };
 
 module.exports = {
   createItem,
   getClothingItem,
-  // updateItem,
   updateLikes,
   deleteItem,
   deleteLikes,

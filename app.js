@@ -3,7 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = require("./routes/index");
 const { errorHandler } = require("./middlewares/errorHandler");
-
+const { errors } = require('celebrate');
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -21,6 +21,10 @@ app.use(express.json());
 
 app.use("/", router);
 
+// Celebrate Error Handler
+app.use(errors());
+
+// Centralized Error Handler
 app.use(errorHandler);
 
 

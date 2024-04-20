@@ -3,19 +3,21 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/user");
 const {
-  BadRequest,
-  Unauthorized,
+  BadRequestError,
+  UnauthorizedError,
   // Forbidden,
-  NotFound,
-  Duplicate,
-  DefaultError,
+  NotFoundError,
+  DuplicateError,
+  DefaultErrorError,
 } = require("../utils/errors");
 
 // LOGIN
 const login = (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(BadRequest).send({ message: "Invalid data" });
+    if (err.name === "BadRequestError"){
+      next(new BadRequestError(err.message));
+    };
   }
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -25,8 +27,9 @@ const login = (req, res) => {
       res.status(200).send({ token });
     })
     .catch((err) => {
-      console.error(err);
-      return res.status(Unauthorized).send({ message: "Not Authorized." });
+      if (err.name === "UnauthorizedError") {
+        next(new UnauthorizedError(err.message));
+      };
     });
 };
 
@@ -43,13 +46,11 @@ const createUser = (req, res) => {
         .send({ name: user.name, avatar: user.avatar, email: user.email });
     })
     .catch((err) => {
-      console.error(err);
-      console.log(err.name);
-      if (err.code === 11000) {
-        return res.status(Duplicate).send({ message: "Duplicate Email." });
+      if (err.name === "DuplicateError") {
+        next(new DuplicateError(err.message));
       }
       if (err.name === "ValidationError") {
-        return res.status(BadRequest).send({ message: err.message });
+        next(new BadRequestError(err.message));
       }
       return res
         .status(DefaultError)

@@ -15,7 +15,7 @@ This porject is the backend of our WTWR project. This project uses Routes and Co
 - Database is created and connected to a remote server
 - Error handling used to show error codes for each type of error
 - Use of validation for URL fields
-- Routes and Controllers configured for API connection, sign/up, and modifying user data
+- Routes and Controllers configured for API connection, signin/up, and modifying user data
 - Implemeneted security for routes
 - Authorization solution implementation
 

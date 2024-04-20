@@ -1,24 +1,21 @@
 const clothingItem = require("../models/clothingItem");
-const {
-  BadRequestError,
-  DefaultError,
-  Forbidden,
-  NotFoundError,
-} = require("../utils/errors");
+const BadRequestError = require("../utils/errors/Bad_Request_Error");
+const Forbidden = require("../utils/errors/Forbidden_Error");
+const NotFoundError = require("../utils/errors/Not_Found_Error");
+
 
 // CREATE ITEM
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
 
   clothingItem
     .create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
-      console.log(item);
       res.send({ data: item });
     })
     .catch((err) => {
       if (err.name === "ValidationError") {
-        next(new BadRequest("Invalid data"));
+        next(new BadRequestError(err.message));
       }
       next(err);
     });
@@ -36,7 +33,7 @@ const getClothingItem = (req, res) => {
 
 
 // UPDATE LIKES
-const updateLikes = (req, res) => {
+const updateLikes = (req, res, next) => {
   console.log(req.user._id);
   // const userId = req.user._id;
   const { itemId } = req.params;
@@ -54,14 +51,14 @@ const updateLikes = (req, res) => {
       if (err.name === "NotFoundError") {
         next(new NotFoundError());
       } else if (err.name === "CastError") {
-        next(new BadRequestError());
+        next(new BadRequestError(err.message));
       }
       next(err);
     });
 };
 
 // DELETE ITEM
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
   console.log(itemId);
   clothingItem
@@ -90,7 +87,7 @@ const deleteItem = (req, res) => {
 };
 
 // DELETE LIKES
-const deleteLikes = (req, res) => {
+const deleteLikes = (req, res, next) => {
   console.log(req.user._id);
   // const userId = req.user._id;
   const { itemId } = req.params;

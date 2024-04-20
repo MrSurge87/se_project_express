@@ -7,7 +7,7 @@ const { validateCreateUser, validateUserUpdate, validateAuth } = require("../mid
 router.get("/me", auth, getCurrentUser);
 
 // UPDATE
-router.patch("/me", auth, validateAuth, validateCreateUser, validateUserUpdate, updateProfile);
+router.patch("/me", auth, validateUserUpdate, updateProfile);
 
 
 module.exports = router;

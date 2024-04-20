@@ -78,7 +78,7 @@ const deleteItem = (req, res, next) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "NotFoundError") {
-        next(new NotFoundError());
+        next(new NotFoundError(err.message));
       } else if (err.name === "CastError") {
         next(new BadRequestError("Invalid data"));
       }

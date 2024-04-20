@@ -1,6 +1,6 @@
 const clothingItem = require("../models/clothingItem");
 const BadRequestError = require("../utils/errors/Bad_Request_Error");
-const Forbidden = require("../utils/errors/Forbidden_Error");
+const ForbiddenError = require("../utils/errors/Forbidden_Error");
 const NotFoundError = require("../utils/errors/Not_Found_Error");
 
 
@@ -48,8 +48,8 @@ const updateLikes = (req, res, next) => {
     .then((item) => res.status(200).send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "NotFoundError") {
-        next(new NotFoundError());
+      if (err.name === "DocumentNotFoundError") {
+        next(new NotFoundError(err.message));
       } else if (err.name === "CastError") {
         next(new BadRequestError(err.message));
       }
@@ -66,9 +66,9 @@ const deleteItem = (req, res, next) => {
     .orFail()
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        return res
-          .status(Forbidden)
-          .send({ message: "Not Authorized To Delete." });
+        if (err.name === "ForbbidenError") {
+          next(new ForbiddenError(err.message));
+        };
       }
       return clothingItem
         .findByIdAndDelete(itemId)
@@ -77,7 +77,7 @@ const deleteItem = (req, res, next) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.name === "NotFoundError") {
+      if (err.name === "DocumentNotFoundError") {
         next(new NotFoundError(err.message));
       } else if (err.name === "CastError") {
         next(new BadRequestError("Invalid data"));
@@ -102,7 +102,7 @@ const deleteLikes = (req, res, next) => {
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "NotFoundError") {
+      if (err.name === "DocumentNotFoundError") {
         next(new NotFoundError());
       } else if (err.name === "CastError") {
         next(new BadRequestError("Invalid data"));

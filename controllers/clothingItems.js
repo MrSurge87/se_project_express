@@ -22,7 +22,7 @@ const createItem = (req, res, next) => {
 };
 
 // READ ITEM
-const getClothingItem = (req, res) => {
+const getClothingItem = (req, res, next) => {
   clothingItem
     .find({})
     .then((clothingItems) => res.status(200).send(clothingItems))

@@ -15,6 +15,7 @@ module.exports.validateCreateItem = celebrate({
       "string.max" : 'Maximum of 30 characters',
       "string.empty" : 'The "name" field must be filled in',
     }),
+    weather: Joi.string().valid('hot', 'warm', 'cold').required(),
     imageUrl: Joi.string().required().custom(validateUrl).messages({
       "string.uri" : 'The "imageUrl" field must be a valid url',
       "string.empty" : 'The "imageUrl" field must be filled in',

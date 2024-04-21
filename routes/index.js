@@ -3,17 +3,15 @@ const userRouter = require("./users");
 const clothingItemRouter = require("./clothingItems");
 const { NotFound } = require("../utils/errors");
 const { login, createUser } = require("../controllers/users");
-const { validateCreateUser, validateAuth, validateId } = require("../middlewares/validation");
+const { validateCreateUser, validateAuth } = require("../middlewares/validation");
 
 router.use("/users", userRouter);
 router.use("/items", clothingItemRouter);
-router.post("/signin", login, validateAuth, validateId);
-router.post("/signup", createUser, validateCreateUser);
+router.post("/signin", validateAuth, login,);
+router.post("/signup", validateCreateUser, createUser);
 
 router.use((req, res) => {
-  if (err.name === "NotFoundError") {
-  next(new NoutFoundError(err.message));
-  }
+  next(new NoutFoundError('Not found route'));
 });
 
 module.exports = router;

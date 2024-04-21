@@ -66,9 +66,7 @@ const deleteItem = (req, res, next) => {
     .orFail()
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
-        if (err.name === "ForbbidenError") {
-          next(new ForbiddenError(err.message));
-        };
+          return next(new ForbiddenError("You are not the owner of this item."));
       }
       return clothingItem
         .findByIdAndDelete(itemId)

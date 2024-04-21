@@ -7,9 +7,8 @@ const auth = (req, res, next) => {
   console.log(req.headers);
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
-    if (err.name === "UnauthorizedError") {
-      next(new UnauthorizedError(err.message));
-    }
+      next(new UnauthorizedError("Authorization Required"));
+
   }
 
   const token = authorization.replace("Bearer ", "");
@@ -19,7 +18,7 @@ const auth = (req, res, next) => {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     if (err.name === "UnauthorizedError") {
-      next(new UnauthorizedError(err.message));
+      next(new UnauthorizedError("Authorization Required"));
     }
   }
 

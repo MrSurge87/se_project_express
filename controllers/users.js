@@ -8,16 +8,14 @@ const {
   // Forbidden,
   NotFoundError,
   DuplicateError,
-  DefaultErrorError,
+  DefaultError,
 } = require("../utils/errors");
 
 // LOGIN
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    if (err.name === "BadRequestError"){
-      next(new BadRequestError(err.message));
-    };
+      next(new BadRequestError("Invalid Credentials"));
   }
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -27,14 +25,16 @@ const login = (req, res) => {
       res.status(200).send({ token });
     })
     .catch((err) => {
-      if (err.name === "UnauthorizedError") {
-        next(new UnauthorizedError(err.message));
-      };
+      if (err.name === "Incorrect email or password.") {
+        next(new UnauthorizedError("Invalid Credentials"));
+      } else {
+        next(err);
+      }
     });
 };
 
 // CREATE USER - SIGNUP
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   bcrypt
@@ -51,15 +51,14 @@ const createUser = (req, res) => {
       }
       if (err.name === "ValidationError") {
         next(new BadRequestError(err.message));
+      } else {
+        next(err);
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
 // READ users
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   console.log(userId);
   console.log(req.user);
@@ -68,17 +67,17 @@ const getCurrentUser = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NotFound).send({ message: err.message });
+        next(new NotFoundError(err.message));
       }
       if (err.name === "CastError") {
-        return res.status(BadRequest).send({ message: err.message });
+        next(new BadRequestError(err.message));
       }
-      return res.status(DefaultError).send({ message: err.message });
+      return next(err);
     });
 };
 
 // UPDATE USER
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   const userId = req.user._id;
   const { name, avatar } = req.body;
   User.findByIdAndUpdate(
@@ -93,13 +92,13 @@ const updateProfile = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(BadRequest).send({ message: err.message });
+        next(new UnauthorizedError("Authorization Required"));
       }
       if (err.name === "DocumentNotFoundError") {
-        return res.status(NotFound).send({ message: err.message });
+        next(new NotFoundError("User not found"));
       }
       if (err.name === "CastError") {
-        return res.status(BadRequest).send({ message: err.message });
+        next(new BadRequestError(err.message));
       }
       return res
         .status(DefaultError)

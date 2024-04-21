@@ -11,16 +11,16 @@ const {
 const { validateCreateItem, validateId } = require("../middlewares/validation");
 
 // CREATE
-router.post("/", auth, createItem, validateCreateItem);
+router.post("/", auth, validateCreateItem, createItem);
 
 // READ
-router.get("/", getClothingItem);
+router.get("/", validateId, getClothingItem);
 
 // UPDATE
-router.put("/:itemId/likes", auth, updateLikes, validateId);
+router.put("/:itemId/likes", auth, updateLikes);
 
 // DELETE
-router.delete("/:itemId", auth, deleteItem, validateId);
-router.delete("/:itemId/likes", auth, deleteLikes, validateId);
+router.delete("/:itemId", auth, validateId, deleteItem);
+router.delete("/:itemId/likes", validateId, auth, deleteLikes);
 
 module.exports = router;

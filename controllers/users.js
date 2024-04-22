@@ -2,20 +2,17 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/config");
 const User = require("../models/user");
-const {
-  BadRequestError,
-  UnauthorizedError,
-  // Forbidden,
-  NotFoundError,
-  DuplicateError,
-  DefaultError,
-} = require("../utils/errors");
+const BadRequestError = require("../utils/errors/Bad_Request_Error");
+const UnauthorizedError = require("../utils/errors/Unauthorized_Error");
+const NotFoundError = require("../utils/errors/Not_Found_Error");
+const DuplicateError = require("../utils/errors/Duplicate_Error");
+const DefaultError = require("../utils/errors/Default_Error");
 
 // LOGIN
 const login = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-      next(new BadRequestError("Invalid Credentials"));
+    next(new BadRequestError("Invalid Credentials"));
   }
   return User.findUserByCredentials(email, password)
     .then((user) => {
@@ -25,7 +22,7 @@ const login = (req, res, next) => {
       res.status(200).send({ token });
     })
     .catch((err) => {
-      if (err.name === "Incorrect email or password.") {
+      if (err.message === "Incorrect email or password.") {
         next(new UnauthorizedError("Invalid Credentials"));
       } else {
         next(err);
@@ -46,7 +43,7 @@ const createUser = (req, res, next) => {
         .send({ name: user.name, avatar: user.avatar, email: user.email });
     })
     .catch((err) => {
-      if (err.name === "DuplicateError") {
+      if (err.code === "11000") {
         next(new DuplicateError(err.message));
       }
       if (err.name === "ValidationError") {
@@ -99,10 +96,9 @@ const updateProfile = (req, res, next) => {
       }
       if (err.name === "CastError") {
         next(new BadRequestError(err.message));
+      } else {
+        next(err);
       }
-      return res
-        .status(DefaultError)
-        .send({ message: "An error has occured on the server." });
     });
 };
 

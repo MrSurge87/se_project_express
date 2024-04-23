@@ -6,7 +6,6 @@ const BadRequestError = require("../utils/errors/Bad_Request_Error");
 const UnauthorizedError = require("../utils/errors/Unauthorized_Error");
 const NotFoundError = require("../utils/errors/Not_Found_Error");
 const DuplicateError = require("../utils/errors/Duplicate_Error");
-const DefaultError = require("../utils/errors/Default_Error");
 
 // LOGIN
 const login = (req, res, next) => {
@@ -43,7 +42,7 @@ const createUser = (req, res, next) => {
         .send({ name: user.name, avatar: user.avatar, email: user.email });
     })
     .catch((err) => {
-      if (err.code === "11000") {
+      if (err.code === 11000) {
         next(new DuplicateError(err.message));
       }
       if (err.name === "ValidationError") {
@@ -102,18 +101,6 @@ const updateProfile = (req, res, next) => {
     });
 };
 
-// DELETE USER
-// const deleteUser = (req, res) => {
-//   const { userId } = req.params;
-//   User.findByIdAndDelete(userId)
-//     .orFail()
-//     .then((user) => res.status(204).send({}))
-//     .catch((err) => {
-//       res
-//         .status(DefaultError)
-//         .send({ message: "An error has occurred on the server." });
-//     });
-// };
 
 module.exports = {
   login,

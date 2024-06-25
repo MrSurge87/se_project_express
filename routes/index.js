@@ -8,7 +8,7 @@ const { validateCreateUser, validateAuth } = require("../middlewares/validation"
 router.use("/users", userRouter);
 router.use("/items", clothingItemRouter);
 router.post("/signin", validateAuth, login,);
-router.post("/signup", validateCreateUser, createUser);
+router.post("/signUp", validateCreateUser, createUser);
 
 router.use((req, res, next) => {
   next(new NotFoundError('Not found route'));

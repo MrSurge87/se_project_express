@@ -25,14 +25,10 @@ module.exports.validateCreateItem = celebrate({
 
 module.exports.validateCreateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30).messages({
+    username: Joi.string().required().min(2).max(30).messages({
       "string.min" : 'Must be minimum of 2 characters long.',
       "string.max" : 'Maximum of 30 characters',
       "string.empty" : 'The "name" field mst be filled in',
-    }),
-    avatar: Joi.string().required().custom(validateUrl).messages({
-      "string.empty" : 'The "avatarUrl" field must be filled in',
-      "string.uri" : 'The "avatarUrl" must be a valid url',
     }),
     email: Joi.string().required().email().messages({
       "string.empty" : 'The "email" field must be filled in',

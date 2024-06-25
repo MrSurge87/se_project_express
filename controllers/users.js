@@ -31,17 +31,17 @@ const login = (req, res, next) => {
 
 // CREATE USER - SIGNUP
 const createUser = (req, res, next) => {
-  const { name, avatar, email, password } = req.body;
+  const { username, email, password } = req.body;
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({ name, avatar, email, password: hash }))
+    .then((hash) => User.create({ username, email, password: hash }))
     .then((user) => {
-      res
-        .status(201)
-        .send({ name: user.name, avatar: user.avatar, email: user.email });
+      console.log(user);
+      res.status(201).send({ user: user.username, email: user.email });
     })
     .catch((err) => {
+      console.log(">>>ERROR", err);
       if (err.code === 11000) {
         next(new DuplicateError(err.message));
       }
@@ -100,7 +100,6 @@ const updateProfile = (req, res, next) => {
       }
     });
 };
-
 
 module.exports = {
   login,
